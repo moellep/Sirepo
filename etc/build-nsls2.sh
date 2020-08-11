@@ -29,9 +29,12 @@ build_nsls2_guest_main() {
     cd ../..
     install -m 644 env/work/srw_python/{{srwl,uti}*.py,srwlpy*.so} \
         "$(python -c 'from distutils.sysconfig import get_python_lib as x; print(x())')"
+    pip uninstall -y pykern >& /dev/null || true
+    cd ../pykern
+    pip install .
     cd ../sirepo
-    pip uninstall sirepo >& /dev/null || true
-    pip install -r requirements.txt
+    pip uninstall -y sirepo >& /dev/null || true
+    # pip install -r requirements.txt
     pip install .
     sirepo srw create_predefined
     cd /
@@ -46,6 +49,7 @@ build_nsls2_host_main() {
     mkdir "$d"
     cp -a "$s" "$d"
     cd "$d"
+    cp -a ~/src/radiasoft/pykern pykern
     mkdir sirepo
     cp -a ../../{LICENSE,README.md,requirements.txt,setup.py,sirepo,.git} sirepo
     mkdir -p SRW/env/work/srw_python
