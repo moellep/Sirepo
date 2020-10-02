@@ -408,6 +408,13 @@ SIREPO.app.factory('srwService', function(activeSection, appDataService, appStat
         ]);
     };
 
+    self.updatePlotRange = function(modelName, modelKey) {
+        panelState.showFields(modelName, [
+            ['horizontalStart', 'horizontalEnd', 'verticalStart', 'verticalEnd'],
+            appState.models[modelKey || modelName].usePlotRange == '1',
+        ]);
+    };
+
     self.updateIntensityReport = function(modelName) {
         panelState.showField(modelName, 'fieldUnits', self.isGaussianBeam());
         if (self.isElectronBeam()) {
@@ -788,9 +795,15 @@ var srwIntensityLimitLogic = function(panelState, srwService, $scope) {
             $scope.modelName,
             $scope.modelData ? $scope.modelData.modelKey : null);
     }
+    function updatePlotRange() {
+        srwService.updatePlotRange(
+            $scope.modelName,
+            $scope.modelData ? $scope.modelData.modelKey : null);
+    }
 
     function updateSelected() {
         updateIntensityLimit();
+        updatePlotRange();
         panelState.showField($scope.modelName, 'fieldUnits', srwService.isGaussianBeam());
 
         var schemaModel = SIREPO.APP_SCHEMA.model[$scope.modelName];
@@ -812,6 +825,10 @@ var srwIntensityLimitLogic = function(panelState, srwService, $scope) {
             ($scope.modelData ? $scope.modelData.modelKey : $scope.modelName)
                 + '.useIntensityLimits',
         ], updateIntensityLimit,
+        [
+            ($scope.modelData ? $scope.modelData.modelKey : $scope.modelName)
+                + '.usePlotRange',
+        ], updatePlotRange,
     ];
     if ($scope.modelName == 'sourceIntensityReport') {
         $scope.watchFields.push(
@@ -828,6 +845,8 @@ var srwIntensityLimitLogic = function(panelState, srwService, $scope) {
 ].forEach(function(view) {
     SIREPO.viewLogic(view, srwIntensityLimitLogic);
 });
+
+
 
 SIREPO.viewLogic('brillianceReportView', function(appState, panelState, $scope) {
 

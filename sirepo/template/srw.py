@@ -1609,6 +1609,20 @@ def _remap_3d(info, allrange, z_label, z_units, report):
     if report.get('useIntensityLimits', '0') == '1':
         ar2d[ar2d < report.minIntensityLimit] = report.minIntensityLimit
         ar2d[ar2d > report.maxIntensityLimit] = report.maxIntensityLimit
+    if report.get('usePlotRange', '0') == '1':
+        x_left, x_right = report.horizontalStart, report.horizontalEnd
+        y_left, y_right = report.verticalStart, report.verticalEnd
+        if x_left < x_range[0]: x_left = x_range[0]
+        if x_right > x_range[1]: x_right = x_range[1]
+        if y_left < y_range[0]: y_left = y_range[0]
+        if y_right > y_range[1]: y_right = y_range[1]
+        x = np.linspace(allrange[3], allrange[4], allrange[5])
+        y = np.linspace(allrange[6], allrange[7], allrange[8])
+        xsel = ((x >= x_left) & (x <= x_right))
+        ysel = ((y >= y_left) & (y <= y_right))
+        ar2d = np.compress(xsel, np.compress(ysel, ar2d, axis=0), axis=1)
+        x_range = [x_left, x_right, np.shape(ar2d)[1]]
+        y_range = [y_left, y_right, np.shape(ar2d)[0]]
     if not width_pixels:
         # upper limit is browser's max html canvas size
         width_pixels = _CANVAS_MAX_SIZE

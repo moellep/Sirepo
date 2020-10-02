@@ -405,6 +405,11 @@
             "useIntensityLimits": ["Use Intensity Limits", "Boolean", "0"],
             "minIntensityLimit": ["Minimum Intensity", "Float", 0],
             "maxIntensityLimit": ["Maximum Intensity", "Float", 1e30],
+            "usePlotRange": ["Crop Plot", "Boolean", "0"],
+            "horizontalStart": ["Horizontal Start Coordinate [m]", "Float", 0],
+            "horizontalEnd": ["Horizontal End Coordinate [m]", "Float", 0],
+            "verticalStart": ["Vertical Start Coordinate [m]", "Float", 1],
+            "verticalEnd": ["Vertical End Coordinate [m]", "Float", 1],
             "notes": ["Notes", "Text", ""]
         },
         "aperture": {
@@ -996,12 +1001,17 @@
                     "plotScale",
                     "useIntensityLimits",
                     "minIntensityLimit",
-                    "maxIntensityLimit"
+                    "maxIntensityLimit",
+                    "usePlotRange",
+                    "horizontalStart",
+                    "horizontalEnd",
+                    "verticalStart",
+                    "verticalEnd"
                 ]],
-		["Rotation", [
-		    "rotateAngle",
-		    "rotateReshape"
-		]],
+        		["Rotation", [
+                    "rotateAngle",
+                    "rotateReshape"
+                ]],
                 ["Other", [
                     "colorMap",
                     "aspectRatio"
