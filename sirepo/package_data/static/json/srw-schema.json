@@ -406,10 +406,10 @@
             "minIntensityLimit": ["Minimum Intensity", "Float", 0],
             "maxIntensityLimit": ["Maximum Intensity", "Float", 1e30],
             "usePlotRange": ["Crop Plot", "Boolean", "0"],
-            "horizontalStart": ["Horizontal Start Coordinate [m]", "Float", 0],
-            "horizontalEnd": ["Horizontal End Coordinate [m]", "Float", 0],
-            "verticalStart": ["Vertical Start Coordinate [m]", "Float", 1],
-            "verticalEnd": ["Vertical End Coordinate [m]", "Float", 1],
+            "horizontalStart": ["Horizontal Start Coordinate [mm]", "Float", -1],
+            "horizontalEnd": ["Horizontal End Coordinate [mm]", "Float", 1],
+            "verticalStart": ["Vertical Start Coordinate [mm]", "Float", -1],
+            "verticalEnd": ["Vertical End Coordinate [mm]", "Float", 1],
             "notes": ["Notes", "Text", ""]
         },
         "aperture": {

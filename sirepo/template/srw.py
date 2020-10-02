@@ -1605,19 +1605,19 @@ def _remap_3d(info, allrange, z_label, z_units, report):
     ar2d = info['points']
     totLen = int(x_range[2] * y_range[2])
     n = len(ar2d) if totLen > len(ar2d) else totLen
-    ar2d = np.reshape(ar2d[0:n], (y_range[2], x_range[2]))
+    ar2d = np.reshape(ar2d[0:n], (int(y_range[2]), int(x_range[2])))
     if report.get('useIntensityLimits', '0') == '1':
         ar2d[ar2d < report.minIntensityLimit] = report.minIntensityLimit
         ar2d[ar2d > report.maxIntensityLimit] = report.maxIntensityLimit
     if report.get('usePlotRange', '0') == '1':
-        x_left, x_right = report.horizontalStart, report.horizontalEnd
-        y_left, y_right = report.verticalStart, report.verticalEnd
-        if x_left < x_range[0]: x_left = x_range[0]
-        if x_right > x_range[1]: x_right = x_range[1]
-        if y_left < y_range[0]: y_left = y_range[0]
-        if y_right > y_range[1]: y_right = y_range[1]
-        x = np.linspace(allrange[3], allrange[4], allrange[5])
-        y = np.linspace(allrange[6], allrange[7], allrange[8])
+        x_left, x_right = np.clip(x_range[:2], report.horizontalStart*1e-3, report.horizontalEnd*1e-3)
+        if x_left > x_range[1] or x_right < x_range[0]: # restore back if no intersection
+            x_left, x_right = x_range[:2]
+        y_left, y_right = np.clip(y_range[:2], report.verticalStart*1e-3, report.verticalEnd*1e-3)
+        if y_left > y_range[1] or y_right < y_range[0]:  # restore back if no intersection
+            y_left, y_right = y_range[:2]
+        x = np.linspace(allrange[3], allrange[4], int(allrange[5]))
+        y = np.linspace(allrange[6], allrange[7], int(allrange[8]))
         xsel = ((x >= x_left) & (x <= x_right))
         ysel = ((y >= y_left) & (y <= y_right))
         ar2d = np.compress(xsel, np.compress(ysel, ar2d, axis=0), axis=1)
