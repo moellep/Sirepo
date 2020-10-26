@@ -410,7 +410,7 @@ SIREPO.app.factory('srwService', function(activeSection, appDataService, appStat
 
     self.updatePlotRange = function(modelName, modelKey) {
         panelState.showFields(modelName, [
-            ['horizontalStart', 'horizontalEnd', 'verticalStart', 'verticalEnd'],
+            ['horizontalSize', 'horizontalOffset', 'verticalSize', 'verticalOffset'],
             appState.models[modelKey || modelName].usePlotRange == '1',
         ]);
     };
