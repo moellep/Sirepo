@@ -744,7 +744,7 @@ SIREPO.app.controller('SourceController', function (appState, panelState, srwSer
     });
 });
 
-SIREPO.app.directive('appFooter', function(appState, srwService) {
+SIREPO.app.directive('appFooter', function(appState, requestSender, srwService) {
     return {
         restrict: 'A',
         scope: {
@@ -788,7 +788,7 @@ var srwGrazingAngleLogic = function(panelState, srwService, $scope) {
     SIREPO.beamlineItemLogic(m, srwGrazingAngleLogic);
 });
 
-var srwIntensityLimitLogic = function(panelState, srwService, $scope) {
+var srwIntensityLimitLogic = function(appState, panelState, srwService, $scope) {
 
     function updateIntensityLimit() {
         srwService.updateIntensityLimit(
@@ -819,11 +819,11 @@ var srwIntensityLimitLogic = function(panelState, srwService, $scope) {
         }
     }
 
+    var modelKey = $scope.modelData ? $scope.modelData.modelKey : $scope.modelName;
     $scope.whenSelected = updateSelected;
     $scope.watchFields = [
         [
-            ($scope.modelData ? $scope.modelData.modelKey : $scope.modelName)
-                + '.useIntensityLimits',
+            modelKey + '.useIntensityLimits',
         ], updateIntensityLimit,
         [
             ($scope.modelData ? $scope.modelData.modelKey : $scope.modelName)
@@ -837,6 +837,18 @@ var srwIntensityLimitLogic = function(panelState, srwService, $scope) {
                 srwService.updateIntensityReport('sourceIntensityReport');
             });
     }
+    $scope.$on(modelKey + '.summaryData', function(e, info) {
+        // update plot size info from summaryData
+        if (appState.isLoaded()) {
+            var range = info.fieldRange;
+            var m = appState.models[modelKey];
+            m.horizontalSize = range[4] - range[3];
+            m.horizontalOffset = (range[3] + range[4]) / 2;
+            m.verticalSize = range[7] - range[6];
+            m.verticalOffset = (range[6] + range[7]) / 2;
+            appState.saveQuietly(modelKey);
+        }
+    });
 };
 
 [

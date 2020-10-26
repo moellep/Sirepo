@@ -322,6 +322,10 @@ def extract_report_data(filename, sim_in):
         'x_units': file_info[filename][1][0],
         'y_units': file_info[filename][1][1],
         'points': data,
+        # send the full plot ranges as summaryData
+        'summaryData': PKDict(
+            fieldRange=allrange,
+        ),
     })
     rep_name = _SIM_DATA.WATCHPOINT_REPORT if _SIM_DATA.is_watchpoint(r) else r
     if _DATA_FILE_FOR_MODEL[rep_name]['dimension'] == 3:
@@ -1718,6 +1722,7 @@ def _remap_3d(info, allrange, z_label, z_units, report):
         title=info['title'],
         subtitle=_superscript_2(info['subtitle']),
         z_matrix=ar2d.tolist(),
+        summaryData=info.summaryData,
     )
 
 
