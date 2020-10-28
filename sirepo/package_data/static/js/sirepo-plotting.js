@@ -36,6 +36,13 @@ SIREPO.app.factory('plotting', function(appState, frameCache, panelState, utilit
         log10: safeLog(Math.log10, '10'),
     };
 
+    function broadcastSummaryData(name, summaryData) {
+        // send info in two formats, similar to modelChanged
+	console.log("broadcast data:", name, summaryData);
+        $rootScope.$broadcast(name + '.summaryData', summaryData);
+        $rootScope.$broadcast('summaryData', name, summaryData);
+    }
+
     function colorsFromString(s) {
         return s.match(/.{6}/g).map(function(x) {
             return "#" + x;
@@ -63,7 +70,7 @@ SIREPO.app.factory('plotting', function(appState, frameCache, panelState, utilit
                     panelState.setError(scope.modelName, null);
                     scope.load(data);
                     if (data.summaryData) {
-                        $rootScope.$broadcast(scope.modelName + '.summaryData', data.summaryData);
+                        broadcastSummaryData(scope.modelName, data.summaryData);
                     }
                 }
                 if (scope.isPlaying) {
@@ -190,7 +197,7 @@ SIREPO.app.factory('plotting', function(appState, frameCache, panelState, utilit
                         scope.clearData();
                         scope.load(data);
                         if (data.summaryData) {
-                            $rootScope.$broadcast(scope.modelName + '.summaryData', data.summaryData);
+                            broadcastSummaryData(scope.modelName, data.summaryData);
                         }
                     }
                     else if (forceRunCount++ <= 2) {

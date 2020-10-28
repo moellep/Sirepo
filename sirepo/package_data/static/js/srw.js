@@ -159,6 +159,25 @@ SIREPO.app.factory('srwService', function(activeSection, appDataService, appStat
         tag.text(repName);
     };
 
+    self.addSummaryDataListener = function(scope) {
+        scope.$on('summaryData', function(e, modelKey, info) {
+            // update plot size info from summaryData
+            console.log("on summaryData", appState.isLoaded(), modelKey, info);
+            if (appState.isLoaded()) {
+                var range = info.fieldRange;
+                var m = appState.models[modelKey];
+                // only set the default plot range if no override is currently used
+                if (m && 'usePlotRange' in m && m.usePlotRange == '0') {
+                    m.horizontalSize = range[4] - range[3];
+                    m.horizontalOffset = (range[3] + range[4]) / 2;
+                    m.verticalSize = range[7] - range[6];
+                    m.verticalOffset = (range[6] + range[7]) / 2;
+                    appState.saveQuietly(modelKey);
+                }
+            }
+        });
+    };
+
     self.computeBeamParameters = function() {
         self.computeOnServer(
             'process_beam_parameters',
@@ -409,10 +428,10 @@ SIREPO.app.factory('srwService', function(activeSection, appDataService, appStat
     };
 
     self.updatePlotRange = function(modelName, modelKey) {
-        panelState.showFields(modelName, [
-            ['horizontalSize', 'horizontalOffset', 'verticalSize', 'verticalOffset'],
-            appState.models[modelKey || modelName].usePlotRange == '1',
-        ]);
+        panelState.showRow(
+            modelName,
+            'horizontalOffset',
+            appState.models[modelKey || modelName].usePlotRange == '1');
     };
 
     self.updateIntensityReport = function(modelName) {
@@ -683,6 +702,7 @@ SIREPO.app.controller('BeamlineController', function (activeSection, appState, b
         $scope.$on('simulation.changed', syncDistanceFromSourceToFirstElementPosition);
         $scope.$on('multiElectronAnimation.changed', updateMultiElectronWatchpoint);
         $scope.$on('initialIntensityReport.changed', copyIntensityReportCharacteristics);
+        srwService.addSummaryDataListener($scope);
     });
 
     $scope.$on('$destroy', function() {
@@ -741,6 +761,7 @@ SIREPO.app.controller('SourceController', function (appState, panelState, srwSer
     appState.whenModelsLoaded($scope, function() {
         srwService.changeFluxReportName('fluxAnimation.fluxType');
         srwService.changeFluxReportName('fluxReport.fluxType');
+        srwService.addSummaryDataListener($scope);
     });
 });
 
@@ -837,18 +858,6 @@ var srwIntensityLimitLogic = function(appState, panelState, srwService, $scope) 
                 srwService.updateIntensityReport('sourceIntensityReport');
             });
     }
-    $scope.$on(modelKey + '.summaryData', function(e, info) {
-        // update plot size info from summaryData
-        if (appState.isLoaded()) {
-            var range = info.fieldRange;
-            var m = appState.models[modelKey];
-            m.horizontalSize = range[4] - range[3];
-            m.horizontalOffset = (range[3] + range[4]) / 2;
-            m.verticalSize = range[7] - range[6];
-            m.verticalOffset = (range[6] + range[7]) / 2;
-            appState.saveQuietly(modelKey);
-        }
-    });
 };
 
 [
