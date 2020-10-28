@@ -168,10 +168,10 @@ SIREPO.app.factory('srwService', function(activeSection, appDataService, appStat
                 var m = appState.models[modelKey];
                 // only set the default plot range if no override is currently used
                 if (m && 'usePlotRange' in m && m.usePlotRange == '0') {
-                    m.horizontalSize = range[4] - range[3];
-                    m.horizontalOffset = (range[3] + range[4]) / 2;
-                    m.verticalSize = range[7] - range[6];
-                    m.verticalOffset = (range[6] + range[7]) / 2;
+                    m.horizontalSize = (range[4] - range[3]) *1e3;
+                    m.horizontalOffset = (range[3] + range[4]) *1e3 / 2;
+                    m.verticalSize = (range[7] - range[6]) *1e3;
+                    m.verticalOffset = (range[6] + range[7]) *1e3 / 2;
                     appState.saveQuietly(modelKey);
                 }
             }
