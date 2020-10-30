@@ -322,9 +322,11 @@ def extract_report_data(filename, sim_in):
         'x_units': file_info[filename][1][0],
         'y_units': file_info[filename][1][1],
         'points': data,
+        'z_range' : [np.min(data), np.max(data)],
         # send the full plot ranges as summaryData
         'summaryData': PKDict(
             fieldRange=allrange,
+            fieldIntensityRange=report_model.get('summaryData', {}).get('fieldIntensityRange', [np.min(data), np.max(data)]),
         ),
     })
     rep_name = _SIM_DATA.WATCHPOINT_REPORT if _SIM_DATA.is_watchpoint(r) else r
@@ -1631,6 +1633,7 @@ def _remap_3d(info, allrange, z_label, z_units, report):
     totLen = int(x_range[2] * y_range[2])
     n = len(ar2d) if totLen > len(ar2d) else totLen
     ar2d = np.reshape(ar2d[0:n], (int(y_range[2]), int(x_range[2])))
+
     if report.get('useIntensityLimits', '0') == '1':
         ar2d[ar2d < report.minIntensityLimit] = report.minIntensityLimit
         ar2d[ar2d > report.maxIntensityLimit] = report.maxIntensityLimit
@@ -1713,6 +1716,7 @@ def _remap_3d(info, allrange, z_label, z_units, report):
 
     if z_units:
         z_label = u'{} [{}]'.format(z_label, z_units)
+
     return PKDict(
         x_range=x_range,
         y_range=y_range,
@@ -1722,6 +1726,7 @@ def _remap_3d(info, allrange, z_label, z_units, report):
         title=info['title'],
         subtitle=_superscript_2(info['subtitle']),
         z_matrix=ar2d.tolist(),
+        z_range = [report.minIntensityLimit, report.maxIntensityLimit] if report.get('useIntensityLimits', '0') == '1'  else [np.min(ar2d), np.max(ar2d)],
         summaryData=info.summaryData,
     )
 

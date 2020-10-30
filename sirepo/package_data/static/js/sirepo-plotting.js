@@ -499,6 +499,13 @@ SIREPO.app.factory('plotting', function(appState, frameCache, panelState, utilit
                     min: scaleFunction(plotRange.min),
                     max: scaleFunction(plotRange.max),
                 };
+                if (scaleFunction.hasOwnProperty('powerName') &&
+                    ["e", "10", "2"].indexOf(scaleFunction.powerName) > Math.max(1e-100, plotRange.min-1e-100)) {
+                    plotRange.min = d3.min(heatmap, function(row) {
+                        return d3.min(row, function(x) {
+                            return x <= 0 ? Infinity : x;});
+                    });
+                }
             }
             var colorScale = this.colorScaleForPlot(plotRange, modelName);
             var xSize = heatmap[0].length;
@@ -701,6 +708,7 @@ SIREPO.app.factory('plotting', function(appState, frameCache, panelState, utilit
 
         recalculateDomainFromPoints: function(modelName, yScale, points, xDomain, invertAxis) {
             var ydom;
+            var min_nonzero = Number.MAX_VALUE;
             var scaleFunction = this.scaleFunction(modelName);
 
             for (var i = 0; i < points.length; i++) {
@@ -719,8 +727,16 @@ SIREPO.app.factory('plotting', function(appState, frameCache, panelState, utilit
                 else {
                     ydom = [d[1], d[1]];
                 }
+                if (d[1] > 0 && d[1] < min_nonzero) { min_nonzero = d[1]; }
             }
+
             if (ydom) {
+                // console.log("name", scaleFunction.powerName);
+                if (ydom[0] == 0 && scaleFunction && scaleFunction.hasOwnProperty("powerName")
+                    && ["e", "2", "10"].indexOf(scaleFunction.powerName) >= 0) {
+                    ydom[0] = min_nonzero;
+                }
+
                 ydom = this.scaleYDomain(yScale, ydom, scaleFunction, ydom[0] > 0);
                 if (invertAxis) {
                     var x = ydom[0];
@@ -2749,6 +2765,7 @@ SIREPO.app.directive('plot3d', function(appState, focusPointService, layoutServi
                 select('.z-axis-label').text(json.z_label);
                 var zmin = plotting.min2d(heatmap);
                 var zmax = plotting.max2d(heatmap);
+                if ('z_range' in json) { zmin = json.z_range[0]; zmax = json.z_range[1]; }
                 scaleFunction = plotting.scaleFunction($scope.modelName);
                 if (zmin > 0 && ! scaleFunction) {
                     zmin = 0;

@@ -165,6 +165,7 @@ SIREPO.app.factory('srwService', function(activeSection, appDataService, appStat
             console.log("on summaryData", appState.isLoaded(), modelKey, info);
             if (appState.isLoaded()) {
                 var range = info.fieldRange;
+                // var intensityRange = info.fieldIntensityRange;
                 var m = appState.models[modelKey];
                 // only set the default plot range if no override is currently used
                 if (m && 'usePlotRange' in m && m.usePlotRange == '0') {
@@ -172,6 +173,12 @@ SIREPO.app.factory('srwService', function(activeSection, appDataService, appStat
                     m.horizontalOffset = (range[3] + range[4]) *1e3 / 2;
                     m.verticalSize = (range[7] - range[6]) *1e3;
                     m.verticalOffset = (range[6] + range[7]) *1e3 / 2;
+                    appState.saveQuietly(modelKey);
+                }
+                if (m && 'useIntensityLimits' in m && m.useIntensityLimits == '0') {
+                    console.log(info)
+                    m.minIntensityLimit = info.fieldIntensityRange[0]; // intensityRange[0];
+                    m.maxIntensityLimit = info.fieldIntensityRange[1]; // intensityRange[1];
                     appState.saveQuietly(modelKey);
                 }
             }
