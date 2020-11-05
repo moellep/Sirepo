@@ -499,12 +499,13 @@ SIREPO.app.factory('plotting', function(appState, frameCache, panelState, utilit
                     min: scaleFunction(plotRange.min),
                     max: scaleFunction(plotRange.max),
                 };
-                if (scaleFunction.hasOwnProperty('powerName') &&
-                    ["e", "10", "2"].indexOf(scaleFunction.powerName) > Math.max(1e-100, plotRange.min-1e-100)) {
+                if (scaleFunction.hasOwnProperty('powerName') && ["e", "10", "2"].indexOf(scaleFunction.powerName) >= 0) {
+                    console.log("chaning min from ", plotRange.min);
                     plotRange.min = d3.min(heatmap, function(row) {
                         return d3.min(row, function(x) {
                             return x <= 0 ? Infinity : x;});
                     });
+                    console.log("new min=", plotRange.min);
                 }
             }
             var colorScale = this.colorScaleForPlot(plotRange, modelName);
@@ -732,7 +733,7 @@ SIREPO.app.factory('plotting', function(appState, frameCache, panelState, utilit
 
             if (ydom) {
                 // console.log("name", scaleFunction.powerName);
-                if (ydom[0] == 0 && scaleFunction && scaleFunction.hasOwnProperty("powerName")
+                if (ydom[0] <= 0 && scaleFunction && scaleFunction.hasOwnProperty("powerName")
                     && ["e", "2", "10"].indexOf(scaleFunction.powerName) >= 0) {
                     ydom[0] = min_nonzero;
                 }
@@ -2383,7 +2384,6 @@ SIREPO.app.directive('plot3d', function(appState, focusPointService, layoutServi
             };
             axes.rightX.noBaseFormat = true;
             axes.bottomY.noBaseFormat = true;
-
             var cursorShape = {
                 '11': 'mouse-move-ew',
                 '10': 'mouse-move-e',

@@ -1693,6 +1693,7 @@ def _remap_3d(info, allrange, z_label, z_units, report):
     # rotate 3D image
     if rotate_angle:
         rotate_reshape = report.get('rotateReshape', '0') == '1'
+        zmin = np.min(ar2d)
         try:
             from scipy import ndimage
             pkdc('Size before: {}  Dimensions: {}', ar2d.size, ar2d.shape)
@@ -1710,6 +1711,8 @@ def _remap_3d(info, allrange, z_label, z_units, report):
 
             x_range[2] = ar2d.shape[1]
             y_range[2] = ar2d.shape[0]
+            pkdlog("setting {} to zero when below threshold {}", np.sum(ar2d<zmin), zmin)
+            ar2d[ar2d < zmin] = 0
             if info['title'] != 'Power Density': info['subtitle'] = info['subtitle'] + ' Image Rotate {}^0'.format(rotate_angle)
         except Exception:
             pkdlog('Cannot rotate the image - scipy.ndimage.rotate() cannot be imported.')
